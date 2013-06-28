@@ -1,0 +1,76 @@
+
+import math
+
+#-------------------------------------------------
+#--------------Calculating Max Altitude Reached---
+#-------------------------------------------------
+
+#Enter Perameters of the Rocket flight here. 
+#Step 1: Enter the Mass of your rocket in KG. 
+Mass = 0.05398
+
+#Step 2: Enter the Diameter of your rocket in meters. 
+#Formula is pi*r^2
+Area = 0.0123952
+Area = math.pi*(math.pow(Area,2))
+
+#Step 3: Compute the wind resistance factor k, k = 0.5*rho*Cd*Area
+  
+Cd = 0.75 #drag coefficient, .75 for average rocket.
+rho = 1.2 #density of air
+
+k = 0.5*rho*Cd*Area
+
+#Step 4: Calculate the burn time t with perameters I for motor impulse in seconds, T for motor thrust in newtons. 
+#A C6 motor has a nominal impulse of 10 N-s and thrust of 6 N. 
+#Impulse for an Estes C6 of 10*90% = 9 N-s.
+
+I = 9.0
+T = 6.0
+t = I/T
+
+#Step 5: Calculate grav force M*g, g is the acceleration of gravity 9.8
+gf = Mass*9.8
+
+#Step 6: Calculate q and x for simplification. 
+q = math.sqrt((T-gf)/k)  #q = sqrt([T - grav force] / k) 
+x = 2.0*k*q/Mass
+
+#Step 7: Calculate velocity at burnout v, boost phase distance yb, coast phase distance, yc
+
+#v = q*[1-e^(-x*t)] / [1+e^(-x*t)]
+#yb = [-M / (2*k)]*ln([T - M*g - k*v^2] / [T - M*g])
+#yc = [+M / (2*k)]*ln([M*g + k*v^2] / [M*g]) 
+
+v = q*(1.0-math.pow(math.e,(-x*t)))/(1.0+math.pow(math.e,(-x*t)))
+y1 = (-Mass/(2*k))*math.log((T-gf-(k*math.pow(v,2)))/(T-(gf)))
+y2 = (Mass/(2*k))*math.log((gf+(k*math.pow(v,2)))/gf)
+
+#Step 8: Calcualte max altitude w/ y1 and y2
+
+Altitude = y1+y2
+
+#-------------------------------------------------
+#--------------Calculating time of flight---------
+#-------------------------------------------------
+
+#Formulas. Burnout + Burn time = Total flight time. 
+
+qa = math.sqrt(gf/k)
+qb = math.sqrt((9.8*k)/Mass)
+ta = math.atan(v/qa)/qb
+engineburntime = 1.5
+
+total_flight_time = engineburntime + ta
+
+print Altitude
+print total_flight_time
+
+
+
+
+
+
+
+
+
